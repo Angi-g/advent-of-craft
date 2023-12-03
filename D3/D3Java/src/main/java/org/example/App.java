@@ -3,88 +3,108 @@ package org.example;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
  * Hello world!
- *
  */
-public class App 
-{
-    public static void main( String[] args ) throws IOException {
-/*
-        String content = "467..114..\n" +
-                "...*......\n" +
-                "..35..633.\n" +
-                "......#...\n" +
-                "617*......\n" +
-                ".....+.58.\n" +
-                "..592.....\n" +
-                "......755.\n" +
-                "...$.*....\n" +
-                ".664.598..";*/
+public class App {
+    public static void main(String[] args) throws IOException {
+        //penses à gérer les exeption non de Zeus !
+
         String content = new String(Files.readAllBytes(Paths.get("src/ressources/fileToProcess.txt")));
 
-
         List<Number> numbersList = new ArrayList<>();
-        List<int[]> symboleList = new ArrayList<>();
+        List<int[]> symbolsList = new ArrayList<>();
+        List<int[]> starsList = new ArrayList<>();
+
         int totalValueTouchBySymboles = 0;
+        int totalValueTouchByStars = 0;
         Scanner scanner = new Scanner(content);
+
         int index = 0;
+
+        Pattern patternSymbols = Pattern.compile("[^0-9^.]");
+        Pattern patternStars = Pattern.compile("[*]");
         while (scanner.hasNextLine()) {
             String line = scanner.nextLine();
             numbersList.addAll(getMapedNumberInOneLine(line, index));
-            symboleList.addAll(getMapedSymboleInLine(line, index));
+            symbolsList.addAll(getMapedSymboleInLine(line, index, patternSymbols));
+            starsList.addAll(getMapedSymboleInLine(line, index, patternStars));
             index++;
         }
 
-        for (int[] ints : symboleList) {
-            totalValueTouchBySymboles += valuesTouchedBySymbol(ints, numbersList);
+        for (int[] symbol : symbolsList) {
+            totalValueTouchBySymboles += valuesTouchedBySymbol(symbol, numbersList);
         }
-        System.out.println( "total value = " + totalValueTouchBySymboles);
+
+        for (int[] star : starsList) {
+            totalValueTouchByStars += valuesTouchedByStar(star, numbersList);
+        }
+
+        System.out.println("total value touch by symbols= " + totalValueTouchBySymboles);
+        System.out.println("total value touch by stars= " + totalValueTouchByStars);
+    }
+
+    static Integer valuesTouchedByStar(final int[] symbols, List<Number> numbersList) {
+
+        List<Integer> totalValue = getListOfValueTouchByPattern(symbols, numbersList);
+
+        if (totalValue.size() == 2) {
+            return totalValue.get(0) * totalValue.get(1);
+        } else {
+            return 0;
+        }
     }
 
     static Integer valuesTouchedBySymbol(final int[] symbols, List<Number> numbersList) {
+        List<Integer> totalValue = getListOfValueTouchByPattern(symbols, numbersList);
 
-        Integer totalValue = 0;
+        return totalValue.stream().mapToInt(Integer::intValue).sum();
+    }
+
+
+    static List<Integer> getListOfValueTouchByPattern(int[] symbols, List<Number> numbersList) {
+        List<Integer> totalValue = new ArrayList<>();
         int indexOfSymbol = symbols[0];
         int coloneOfSymbol = symbols[1];
-        totalValue += valuesOnTopOrBottomOfSymbol(coloneOfSymbol,
-                numbersList.stream().filter(n -> n.indexLine == (indexOfSymbol - 1)).toList());
-        totalValue += valueNextToSymbole(coloneOfSymbol,
-                numbersList.stream().filter(n -> n.indexLine == indexOfSymbol).toList());
-        totalValue += valuesOnTopOrBottomOfSymbol(coloneOfSymbol,
-                numbersList.stream().filter(n -> n.indexLine == (indexOfSymbol + 1)).toList());
+
+        totalValue.addAll(valuesOnTopOrBottomOfSymbol(coloneOfSymbol,
+                numbersList.stream().filter(n -> n.indexLine == (indexOfSymbol - 1)).toList()));
+        totalValue.addAll(valueNextToSymbole(coloneOfSymbol,
+                numbersList.stream().filter(n -> n.indexLine == indexOfSymbol).toList()));
+        totalValue.addAll(valuesOnTopOrBottomOfSymbol(coloneOfSymbol,
+                numbersList.stream().filter(n -> n.indexLine == (indexOfSymbol + 1)).toList()));
 
         return totalValue;
     }
-    static Integer valuesOnTopOrBottomOfSymbol(int coloneOfSymbole, List<Number> numberList) {
-        Integer value = 0;
+    static List<Integer> valuesOnTopOrBottomOfSymbol(int coloneOfSymbole, List<Number> numberList) {
+        List<Integer> values = new ArrayList<>();
         for (Number number : numberList) {
             if (number.start <= coloneOfSymbole + 1
                     && number.end >= coloneOfSymbole - 1) {
-                value += number.value;
+                values.add(number.value);
             }
-            ;
         }
-        return value;
+        return values;
     }
-    static Integer valueNextToSymbole(int coloneOfSymbole, List<Number> numberList) {
-        Integer value = 0;
+
+    static List<Integer> valueNextToSymbole(int coloneOfSymbole, List<Number> numberList) {
+        List<Integer> values = new ArrayList<>();
         for (Number number : numberList) {
             if (number.start == coloneOfSymbole + 1
                     || number.end == coloneOfSymbole - 1) {
-                value += number.value;
+                values.add(number.value);
             }
-            ;
         }
-        return value;
+        return values;
     }
 
-    static List<int[]> getMapedSymboleInLine(String line, int indexLine) {
-        Pattern pattern = Pattern.compile("[^0-9^.]");
+    static List<int[]> getMapedSymboleInLine(String line, int indexLine, Pattern pattern) {
         Matcher matcher = pattern.matcher(line);
 
         List<int[]> symboleList = new ArrayList<>();

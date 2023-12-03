@@ -3,7 +3,9 @@ package org.example;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Unit test for simple App.
@@ -11,7 +13,7 @@ import java.util.*;
 public class AppTest {
 
     @Test
-    void testGetMapedNumberInOneLine(){
+    void testGetMapedNumberInOneLine() {
         String line = "467..114..";
         List<Number> expectedNumbers = new ArrayList<>();
         expectedNumbers.add(new Number(467, 0, 0, 2));
@@ -28,14 +30,15 @@ public class AppTest {
     }
 
     @Test
-    void testGetMapedSymboleInLine(){
+    void testGetMapedSymboleInLine() {
         String line = ".x..#..?..";
+        Pattern patternSymbols = Pattern.compile("[^0-9^.]");
         List<int[]> expectedSymboles = new ArrayList<>();
         expectedSymboles.add(new int[]{0, 1});
         expectedSymboles.add(new int[]{0, 4});
         expectedSymboles.add(new int[]{0, 7});
 
-        List<int[]> actualSymboles = App.getMapedSymboleInLine(line, 0);
+        List<int[]> actualSymboles = App.getMapedSymboleInLine(line, 0, patternSymbols);
 
         Assertions.assertNotEquals(0, actualSymboles.size());
         for (int i = 0; i < actualSymboles.size(); i++) {
@@ -54,7 +57,8 @@ public class AppTest {
         int[] symbols = new int[]{1, 3};
         int indexOfSymbol = symbols[0];
         int coloneOfSymbole = symbols[1];
-        Integer expectedValue = 467;
+        List<Integer> expectedValue = new ArrayList<>();
+        expectedValue.add(467);
 
         List<Number> toTest = numbers.stream().filter(n -> n.indexLine == (indexOfSymbol - 1)).toList();
 
@@ -73,7 +77,10 @@ public class AppTest {
 
         int indexOfSymbol = symbols[0];
         int coloneOfSymbole = symbols[1];
-        Integer expectedValue = 581;
+
+        List<Integer> expectedValue = new ArrayList<>();
+        expectedValue.add(467);
+        expectedValue.add(114);
 
         List<Number> toTest = numbers.stream().filter(n -> n.indexLine == (indexOfSymbol - 1)).toList();
 
@@ -90,10 +97,13 @@ public class AppTest {
         int[] symbols = new int[]{0, 3};
         int indexOfSymbol = symbols[0];
         int coloneOfSymbole = symbols[1];
-        Integer expectedValue = 467;
+        List<Integer> expectedValue = new ArrayList<>();
+        expectedValue.add(467);
 
         List<Number> toTest = numbers.stream().filter(n -> n.indexLine == indexOfSymbol).toList();
 
         Assertions.assertEquals(expectedValue, App.valueNextToSymbole(coloneOfSymbole, toTest));
     }
+
 }
+
