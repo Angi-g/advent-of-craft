@@ -6,7 +6,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Scanner;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
@@ -24,22 +24,18 @@ public class App {
                 Card 5: 87 83 26 28 32 | 88 30 70 12 93 22 82 36
                 Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11""";
 
-        String content = new String(Files.readAllBytes(Paths.get("src/resources/fileToProcess.txt")));
-
-        Scanner scanner = new Scanner(content);
-        String line;
-        int numberOfMatchByLine;
+        List<String> lines = Files.lines(Paths.get("src/resources/fileToProcess.txt")).collect(Collectors.toList());
+        int numberOfMatch ;
         int score = 0;
         int indexCard = 1;
         int[] numberOfCardWonByIndex = initIntArray();
-        while (scanner.hasNextLine()) {
-            line = scanner.nextLine();
+        for (String line : lines) {
 
             List<int[]> parsedLine = parseLineCard(line);
-            numberOfMatchByLine = numberOfMatchInLine(parsedLine);
-            score += countingScoreByLine(numberOfMatchByLine);
-            if (numberOfMatchByLine != 0) {
-                addCardsWonToCount(indexCard, numberOfMatchByLine, numberOfCardWonByIndex);
+            numberOfMatch = getNumberOfMatch(parsedLine);
+            score += countingScoreByLine(numberOfMatch);
+            if (numberOfMatch != 0) {
+                updateCardsCount(indexCard, numberOfMatch, numberOfCardWonByIndex);
             }
             indexCard++;
         }
@@ -54,14 +50,10 @@ public class App {
     }
 
     static int calculateSum(int[] integerArray) {
-        int sum = 0;
-        for (int number : integerArray) {
-            sum += number;
-        }
-        return sum;
+        return Arrays.stream(integerArray).sum();
     }
 
-    static void addCardsWonToCount(int startingIndex, int numberOfMatch, int[] numberOfCardWonByIndex) {
+    static void updateCardsCount(int startingIndex, int numberOfMatch, int[] numberOfCardWonByIndex) {
         int currentIndex = startingIndex;
         while (numberOfMatch > 0) {
             numberOfCardWonByIndex[currentIndex] += numberOfCardWonByIndex[startingIndex - 1];
@@ -71,12 +63,12 @@ public class App {
 
     }
 
-    public static int countingScoreByLine(int numberOfMatchByLine) {
+    public static int countingScoreByLine(int numberOfMatch ) {
 
-        return (int) Math.pow(2, numberOfMatchByLine - 1);
+        return (int) Math.pow(2, numberOfMatch  - 1);
     }
 
-    static int numberOfMatchInLine(List<int[]> line) {
+    static int getNumberOfMatch(List<int[]> line) {
         int numberOfMatch = 0;
         int[] numbersYouHave = line.get(1);
         for (int numberToMatch : line.get(0)) {

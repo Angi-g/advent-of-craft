@@ -33,7 +33,7 @@ public class AppTest {
         line.add(card);
         line.add(numberYouHave);
         int expectedResult = 8;
-        int actualResult = App.numberOfMatchInLine(line);
+        int actualResult = App.getNumberOfMatch(line);
         Assertions.assertEquals(expectedResult, App.countingScoreByLine(actualResult));
     }
 
@@ -51,7 +51,7 @@ public class AppTest {
         int numberOfMatchByLine = 3;
         int[] numberOfCardWonByIndex = {1, 2, 3, 4, 1, 1};
         int[] expectedArray = {1, 2, 5, 6, 3, 1};
-        App.addCardsWonToCount(indexCard, numberOfMatchByLine, numberOfCardWonByIndex);
+        App.updateCardsCount(indexCard, numberOfMatchByLine, numberOfCardWonByIndex);
         Assertions.assertArrayEquals(expectedArray, numberOfCardWonByIndex);
     }
 }
