@@ -34,11 +34,41 @@ public class App {
                 .mapToLong(Long::parseLong)
                 .toArray();
 
+
+
         Map<String, List<long[]>> map = parseMaps(lines);
         Map<String, List<long[]>> conversionMap = convertMapToConvertionMap(map);
 
         findLowestLocationNumberAndPrintIt(seeds, conversionMap);
 
+        findLowestLocationNumberInRangeAndPrintIt(seeds, conversionMap);
+    }
+
+    private static void findLowestLocationNumberInRangeAndPrintIt(long[] seeds, Map<String, List<long[]>> conversionMap) {
+        long seedConverted;
+        long smallestLocation = Long.MAX_VALUE;
+        long smallestLocationSeed = -1;
+        int i = 0;
+        int j = 1;
+        while (j < seeds.length) {
+            long seed = seeds[i];
+            while (seed < seeds[i] + seeds[j]) {
+                seedConverted = endToEndConvertion(conversionMap, seed);
+
+                if (seedConverted < smallestLocation) {
+                    smallestLocation = seedConverted;
+                    smallestLocationSeed = seed;
+
+                }
+                seed++;
+            }
+
+            i+=2;
+            j+=2;
+        }
+
+        System.out.println("smallest location in range : " + smallestLocation);
+        System.out.println("seed of the smallest location in range : " + smallestLocationSeed);
     }
 
     private static void findLowestLocationNumberAndPrintIt(long[] seeds, Map<String, List<long[]>> conversionMap) {
