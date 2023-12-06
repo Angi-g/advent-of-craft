@@ -84,6 +84,7 @@ public class App {
                 convertedArray[2] = lineArray[START_DEST] - lineArray[START_SRC];
                 convertedList.add(convertedArray);
             });
+            convertedList.sort(Comparator.comparingLong(number -> number[0]));
             convertedMap.put(mapName, convertedList);
         });
 
@@ -119,7 +120,6 @@ public class App {
 
     public static long getSimpleConversion(long valueToConvert, List<long[]> conversionMap) {
         long[] lineOfConvertionToUse = null;
-        conversionMap.sort(Comparator.comparingLong(number -> number[0]));
 
         int index = getAproxIndexByBinarySearch(valueToConvert, conversionMap);
 
